@@ -80,3 +80,22 @@ cli/EmployeeAssetManagementCLI.java
 
 ---
 
+## Sample Commands
+```
+asset add --tag A-1001 --name MacBook --category LAPTOP --year 2022 --condition GOOD
+asset list --sort name
+asset find --tag A-1001
+asset update --tag A-1001 --condition DAMAGED
+asset delete --tag A-1001
+
+employee add --id E0001 --name krishika --email krishik@ag.com --status ACTIVE
+employee list
+employee update --id E0001 --status INACTIVE
+
+checkout issue --tag A-1001 --employee E0001 --days 10
+checkout status --tag A-1001
+checkout return --tag A-1001
+checkout list --employee E0001
+
+```
+
