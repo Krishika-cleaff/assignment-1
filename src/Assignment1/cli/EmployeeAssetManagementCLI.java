@@ -1,90 +1,122 @@
-        package Assignment1.cli;
+package Assignment1.cli;
 
-        import Assignment1.services.AssetService;
-        import Assignment1.model.*;
-        import Assignment1.services.CheckoutService;
-        import Assignment1.services.EmployeeService;
+import Assignment1.model.*;
+import Assignment1.services.*;
 
-        import java.util.Scanner;
+import java.util.*;
 
-        public class EmployeeAssetManagementCLI {
+public class EmployeeAssetManagementCLI {
 
-            public static void main(String[] args) {
-                Scanner sc = new Scanner(System.in);
+    private static AssetManagement assetManagement;
+    private static EmployeeManagement employeeManagement;
+    private static CheckoutManagement checkoutManagement;
 
-                AssetService assetService = new AssetService();
-                EmployeeService employeeService = new EmployeeService();
-                CheckoutService checkoutService =
-                        new CheckoutService(assetService, employeeService);
+    public static void main(String[] args) {
 
-                AssetManagement assetCLI = new AssetManagement(assetService, sc);
-                EmployeeManagement EmployeeManagement = new EmployeeManagement(employeeService, sc);
-                CheckoutManagement CheckoutManagement = new CheckoutManagement(checkoutService, sc);
+        Scanner sc = new Scanner(System.in);
 
+        AssetService assetService = new AssetService();
+        assetManagement = new AssetManagement(assetService);
 
-                while (true) {
-                    System.out.println("\nASSET MANAGEMENT SYSTEM");
-                    System.out.println("1. Asset Menu");
-                    System.out.println("2. Employee Menu");
-                    System.out.println("3. Checkout Menu");
-                    System.out.println("0. Exit");
+        EmployeeService employeeService = new EmployeeService();
+        employeeManagement = new EmployeeManagement(employeeService);
 
-                    int choice = sc.nextInt();
-                    sc.nextLine();
+        CheckoutService checkoutService =
+                new CheckoutService(assetService, employeeService);
+        checkoutManagement = new CheckoutManagement(checkoutService);
 
-                    switch (choice) {
-                        case 1 -> assetMenu(assetCLI, sc);
-                        case 2 -> employeeMenu(EmployeeManagement, sc);
-                        case 3 -> checkoutMenu(CheckoutManagement, sc);
-                        case 0 -> {
-                            System.out.println("Goodbye!");
-                            return;
-                        }
-                        default -> System.out.println("Invalid choice");
-                    }
-                }
+        System.out.println("Asset Management System (type 'exit' to quit)");
+
+        while (true) {
+            System.out.print("> ");
+            String input = sc.nextLine().trim();
+
+            if (input.equalsIgnoreCase("exit")) {
+                System.out.println("Goodbye!");
+                break;
             }
 
-            private static void assetMenu(AssetManagement cli, Scanner sc) {
-                System.out.println("1. Add  2. List  3. Search  4. Update  5. Delete");
-                int c = sc.nextInt();
-                sc.nextLine();
+            if (input.isBlank()) continue;
 
-                switch (c) {
-                    case 1 -> cli.addAsset();
-                    case 2 -> cli.listAssets();
-                    case 3 -> cli.searchAssets();
-                    case 4 -> cli.updateAsset();
-                    case 5 -> cli.deleteAsset();
-                    default -> System.out.println("Invalid choice");
-                }
+            try {
+                handleCommand(input);
+            } catch (Exception e) {
+                System.out.println("Invalid command or arguments");
             }
-
-            private static void employeeMenu(EmployeeManagement cli, Scanner sc) {
-               System.out.println("1. Add  2. List  3. Search  4. Update  5. Delete");
-                int c = sc.nextInt();
-                sc.nextLine();
-                 switch (c) {
-                    case 1 -> cli.addEmployee();
-                    case 2 -> cli.listEmployees();
-                    case 3 -> cli.searchEmployee();
-                    case 4 -> cli.updateEmployee();
-                    case 5 -> cli.deleteEmployee();
-                     default -> System.out.println("Invalid choice");
-                    }
-                }
-                private static void checkoutMenu(CheckoutManagement cli, Scanner sc) {
-                    System.out.println("1. Issue  2. Return  3. Status  4. List ");
-
-                    int c = sc.nextInt();
-                    sc.nextLine();
-
-                    switch (c) {
-                        case 1 -> cli.issueAsset();
-                        case 2 -> cli.returnAsset();
-                        case 3 -> cli.checkStatus();
-                        case 4 -> cli.listEmployeeCheckouts();
-                        default -> System.out.println("Invalid choice");
-                    }
-                }
         }
+    }
+
+    // ---------------- COMMAND ROUTER ----------------
+
+    private static void handleCommand(String input) {
+
+        String[] tokens = input.split("\\s+");
+
+        if (tokens.length < 2) {
+            System.out.println("Invalid command");
+            return;
+        }
+
+        String entity = tokens[0];
+        String action = tokens[1];
+
+        switch (entity.toLowerCase()) {
+            case "asset" -> handleAsset(action, tokens);
+            case "employee" -> handleEmployee(action, tokens);
+            case "checkout" -> handleCheckout(action, tokens);
+            default -> System.out.println("Unknown command");
+        }
+    }
+
+    // ---------------- FLAG PARSER ----------------
+
+    private static Map<String, String> parseFlags(String[] tokens) {
+        Map<String, String> map = new HashMap<>();
+        for (int i = 2; i < tokens.length - 1; i += 2) {
+            map.put(tokens[i], tokens[i + 1]);
+        }
+        return map;
+    }
+
+    // ================= ASSET =================
+
+    private static void handleAsset(String action, String[] tokens) {
+        Map<String, String> f = parseFlags(tokens);
+
+        switch (action) {
+            case "add" -> assetManagement.add(f);
+            case "list" -> assetManagement.list(f);
+            case "find" -> assetManagement.find(f);
+            case "update" -> assetManagement.update(f);
+            case "delete" -> assetManagement.delete(f);
+            default -> System.out.println("Invalid asset command");
+        }
+    }
+
+    private static void handleEmployee(String action, String[] tokens) {
+
+        Map<String, String> f = parseFlags(tokens);
+
+        switch (action) {
+            case "add" -> employeeManagement.add(f);
+            case "list" -> employeeManagement.list(f);
+            case "find" -> employeeManagement.find(f);
+            case "update" -> employeeManagement.update(f);
+            case "delete" -> employeeManagement.delete(f);
+            default -> System.out.println("Invalid employee command");
+        }
+    }
+
+    private static void handleCheckout(String action, String[] tokens) {
+
+        Map<String, String> f = parseFlags(tokens);
+
+        switch (action) {
+            case "issue" -> checkoutManagement.issue(f);
+            case "return" -> checkoutManagement.returnAsset(f);
+            case "status" -> checkoutManagement.status(f);
+            case "list" -> checkoutManagement.list(f);
+            default -> System.out.println("Invalid checkout command");
+        }
+    }
+}

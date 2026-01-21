@@ -1,62 +1,72 @@
 package Assignment1.cli;
 
 import Assignment1.services.CheckoutService;
-import Assignment1.model.Checkout;
 
-import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
 
 public class CheckoutManagement {
 
     private final CheckoutService checkoutService;
-    private final Scanner sc;
 
-    public CheckoutManagement(CheckoutService checkoutService, Scanner sc) {
+    public CheckoutManagement(CheckoutService checkoutService) {
         this.checkoutService = checkoutService;
-        this.sc = sc;
     }
 
-    public void issueAsset() {
-        System.out.print("Enter Asset Tag: ");
-        String tag = sc.nextLine();
+    // ISSUE
+    public void issue(Map<String, String> f) {
 
-        System.out.print("Enter Employee ID: ");
-        String empId = sc.nextLine();
+        String tag = f.get("--tag");
+        String empId = f.get("--employee");
+        int days = Integer.parseInt(
+                f.getOrDefault("--days", "7")
+        );
 
-        System.out.print("Enter number of days: ");
-        int days = sc.nextInt();
-        sc.nextLine();
+        if (tag == null || empId == null) {
+            System.out.println("--tag and --employee are required");
+            return;
+        }
 
         checkoutService.issueAsset(tag, empId, days);
     }
 
-    public void returnAsset() {
-        System.out.print("Enter Asset Tag: ");
-        String tag = sc.nextLine();
+    // RETURN
+    public void returnAsset(Map<String, String> f) {
+
+        String tag = f.get("--tag");
+
+        if (tag == null) {
+            System.out.println("--tag is required");
+            return;
+        }
 
         checkoutService.returnAsset(tag);
     }
 
-    public void checkStatus() {
-        System.out.print("Enter Asset Tag: ");
-        String tag = sc.nextLine();
+    // STATUS
+    public void status(Map<String, String> f) {
+
+        String tag = f.get("--tag");
+
+        if (tag == null) {
+            System.out.println("--tag is required");
+            return;
+        }
 
         checkoutService.getStatus(tag);
     }
 
-    public void listEmployeeCheckouts() {
-        System.out.print("Enter Employee ID: ");
-        String empId = sc.nextLine();
+    // LIST
+    public void list(Map<String, String> f) {
 
-        List<Checkout> list = checkoutService.listCheckouts(empId);
+        String empId = f.get("--employee");
 
-        if (list.isEmpty()) {
-            System.out.println("No active checkouts for this employee");
+        if (empId == null) {
+            System.out.println("--employee is required");
             return;
         }
 
-        for (Checkout c : list) {
-            System.out.println("Asset Tag  : " + c.getSerialTag()+", Issue Date : " + c.getIssueDate() +", Due Date : " + c.getDueDate());
-        }
+        checkoutService
+                .listCheckouts(empId)
+                .forEach(System.out::println);
     }
 }

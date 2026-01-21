@@ -43,4 +43,14 @@ public class Employee {
     public void setStatus(EmployeeStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "Employee {" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", email=" + email.value() +
+                ", status=" + status +
+                '}';
+    }
 }

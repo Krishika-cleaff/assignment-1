@@ -63,5 +63,18 @@ public class Asset {
     public void setAvailable(boolean available) {
         this.available = available;
     }
+
+    @Override
+    public String toString() {
+        return "Asset{" +
+                "serialTag='" + serialTag + '\'' +
+                ", name='" + name + '\'' +
+                ", category=" + category +
+                ", purchaseYear=" + purchaseYear +
+                ", condition=" + condition +
+                ", available=" + available +
+                '}';
+    }
+
 }
 

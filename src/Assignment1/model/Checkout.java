@@ -52,4 +52,16 @@ public class Checkout {
     public String getSerialTag() {
         return serialTag;
     }
+
+    @Override
+    public String toString() {
+        return "Checkout{" +
+                "assetTag='" + serialTag + '\'' +
+                ", employeeId='" + employeeId + '\'' +
+                ", issueDate=" + issueDate +
+                ", dueDate=" + dueDate +
+                ", returnDate=" + returnDate +
+                '}';
+    }
+
 }
