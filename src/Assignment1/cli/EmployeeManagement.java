@@ -20,7 +20,7 @@ public class EmployeeManagement {
 
     public void addEmployee() {
 
-        System.out.print("Enter Employee ID (E0001): ");
+        System.out.print("Enter Employee ID ( Format - E0001): ");
         String id = sc.nextLine();
 
         System.out.print("Enter Name: ");
